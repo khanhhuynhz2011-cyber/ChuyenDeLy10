@@ -1,0 +1,226 @@
+<title>Năng Lượng Xanh</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+/* Layout: sky header with turbine/sun/hills scene, then a single question card with a 20-cell battery meter and a jump grid. */
+:root{
+  --bg:#eef6ee; --surface:#ffffff; --fg:#14301f; --muted:#52695a; --line:#cfe0d2;
+  --leaf:#1f8a4c; --leaf-soft:#d8efe0; --sun:#f2a516; --sun-soft:#fdf0cc; --water:#1a7fa8; --water-soft:#d9eef6;
+  --good:#1f8a4c; --good-bg:#dcf2e4; --bad:#c2392b; --bad-bg:#fbe3df;
+  --sky1:#bfe6f5; --sky2:#eef6ee; --hill1:#7cc592; --hill2:#4fa56e; --tower:#ffffff;
+  --font-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-display:"Bricolage Grotesque","Be Vietnam Pro",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c1a14; --surface:#13271e; --fg:#e4f1e8; --muted:#97b3a2; --line:#27443a;
+    --leaf:#4fd18a; --leaf-soft:#173a28; --sun:#f7bd3f; --sun-soft:#3a2e10; --water:#5cc0ea; --water-soft:#12303d;
+    --good:#4fd18a; --good-bg:#16382a; --bad:#ff8b7b; --bad-bg:#3b1f1b;
+    --sky1:#10303a; --sky2:#0c1a14; --hill1:#1d5a3a; --hill2:#14452c; --tower:#cfe6d8; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c1a14; --surface:#13271e; --fg:#e4f1e8; --muted:#97b3a2; --line:#27443a;
+  --leaf:#4fd18a; --leaf-soft:#173a28; --sun:#f7bd3f; --sun-soft:#3a2e10; --water:#5cc0ea; --water-soft:#12303d;
+  --good:#4fd18a; --good-bg:#16382a; --bad:#ff8b7b; --bad-bg:#3b1f1b;
+  --sky1:#10303a; --sky2:#0c1a14; --hill1:#1d5a3a; --hill2:#14452c; --tower:#cfe6d8; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;margin:0}
+.hero{background:linear-gradient(180deg,var(--sky1),var(--sky2));overflow:hidden;position:relative}
+.hero-in{max-width:860px;margin:0 auto;padding-block:28px 0;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--leaf);margin:0 0 6px}
+h1{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,6.5vw,52px);line-height:1.08;margin:0 0 8px;text-wrap:balance}
+.sub{color:var(--muted);margin:0;max-width:46ch}
+.scene{display:block;width:100%;height:auto;margin-top:8px}
+.rotor{transform-origin:0 0;animation:spin 9s linear infinite}
+.rotor.r2{animation-duration:12s}
+@keyframes spin{to{transform:rotate(360deg)}}
+.sunrays{transform-origin:center;animation:spin 60s linear infinite}
+@media (prefers-reduced-motion:reduce){.rotor,.sunrays{animation:none}}
+main{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.meter{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;margin:0 0 6px}
+.cell{height:12px;border-radius:2px;background:var(--line)}
+.cell.ok{background:var(--good)} .cell.no{background:var(--bad)} .cell.cur{background:var(--sun)}
+.meta{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px;font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+.tag{display:inline-block;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:12px}
+.tag.t1{background:var(--sun-soft);color:var(--fg)} .tag.t2{background:var(--water-soft);color:var(--fg)}
+h2{font-family:var(--font-display);font-weight:600;font-size:clamp(18px,3.4vw,22px);line-height:1.4;margin:0 0 18px;text-wrap:pretty}
+.opts{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.opt{width:100%;display:flex;gap:12px;align-items:flex-start;text-align:left;font:inherit;color:inherit;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+.opt:hover:not(:disabled){border-color:var(--leaf)}
+.opt:focus-visible,.btn:focus-visible,.dot:focus-visible,.tog:focus-visible{outline:3px solid var(--water);outline-offset:2px}
+.opt .k{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:14px;background:var(--leaf-soft);color:var(--fg)}
+.opt .tx{min-width:0;padding-top:2px}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--good);background:var(--good-bg)}
+.opt.right .k{background:var(--good);color:var(--surface)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.opt.wrong .k{background:var(--bad);color:var(--surface)}
+.fb{margin-top:16px;padding:12px 14px;border-radius:10px;background:var(--leaf-soft);font-size:15px}
+.fb b{font-weight:600}
+.actions{display:flex;gap:10px;justify-content:space-between;margin-top:18px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:600;border-radius:10px;padding:10px 18px;border:1.5px solid var(--leaf);background:var(--leaf);color:var(--surface);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.nav{margin-top:22px}
+.nav h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 8px}
+.dots{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.dot{font:inherit;font-size:13px;font-variant-numeric:tabular-nums;padding:6px 0;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);cursor:pointer}
+.dot.ok{background:var(--good-bg);border-color:var(--good)} .dot.no{background:var(--bad-bg);border-color:var(--bad)} .dot.cur{border-color:var(--sun);box-shadow:0 0 0 2px var(--sun)}
+.result{text-align:center}
+.score{font-family:var(--font-display);font-weight:800;font-size:clamp(56px,16vw,96px);line-height:1;margin:6px 0;font-variant-numeric:tabular-nums}
+.score small{font-size:.4em;color:var(--muted);font-weight:600}
+.review{display:grid;gap:8px;margin:18px 0 0;padding:0;list-style:none;text-align:left}
+.review li{padding:10px 12px;border-radius:10px;border:1px solid var(--line);font-size:14px}
+.review li.no{background:var(--bad-bg)} .review li.ok{background:var(--good-bg)}
+.review b{font-weight:600}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.tog{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--fg);padding:5px 12px;border-radius:99px;cursor:pointer;z-index:2}
+@media (max-width:480px){.card{padding:16px}.dots{grid-template-columns:repeat(5,1fr)}.dot{padding:9px 0}}
+</style>
+
+<header class="hero">
+  <button class="tog" id="theme" type="button" aria-label="Đổi giao diện sáng tối">Sáng / Tối</button>
+  <div class="hero-in">
+    <p class="eyebrow">Địa lí · Năng lượng và môi trường</p>
+    <h1>Năng Lượng Xanh</h1>
+    <p class="sub">20 câu trắc nghiệm về than, dầu khí, thủy điện, gió, mặt trời, địa nhiệt và hiệu quả sử dụng năng lượng.</p>
+    <svg class="scene" viewBox="0 0 860 190" role="img" aria-label="Mặt trời, tuabin gió và đồi xanh" preserveAspectRatio="xMidYMax meet">
+      <g transform="translate(690 60)">
+        <g class="sunrays"><g stroke="var(--sun)" stroke-width="4" stroke-linecap="round">
+          <line x1="0" y1="-48" x2="0" y2="-62"/><line x1="0" y1="48" x2="0" y2="62"/><line x1="-48" y1="0" x2="-62" y2="0"/><line x1="48" y1="0" x2="62" y2="0"/>
+          <line x1="34" y1="34" x2="44" y2="44"/><line x1="-34" y1="-34" x2="-44" y2="-44"/><line x1="34" y1="-34" x2="44" y2="-44"/><line x1="-34" y1="34" x2="-44" y2="44"/></g></g>
+        <circle r="34" fill="var(--sun)"/>
+      </g>
+      <path d="M0 150 Q140 100 300 140 T600 135 T860 120 V190 H0Z" fill="var(--hill1)"/>
+      <path d="M0 170 Q200 130 380 165 T860 150 V190 H0Z" fill="var(--hill2)"/>
+      <g fill="var(--tower)" stroke="var(--tower)">
+        <g transform="translate(150 150)"><path d="M-3 0 L-1.5 -92 H1.5 L3 0Z"/>
+          <g transform="translate(0 -92)"><g class="rotor"><path d="M0 0 L-4 -6 L0 -62 L4 -6Z"/><path d="M0 0 L-4 -6 L0 -62 L4 -6Z" transform="rotate(120)"/><path d="M0 0 L-4 -6 L0 -62 L4 -6Z" transform="rotate(240)"/></g><circle r="5"/></g></g>
+        <g transform="translate(260 156) scale(.75)"><path d="M-3 0 L-1.5 -92 H1.5 L3 0Z"/>
+          <g transform="translate(0 -92)"><g class="rotor r2"><path d="M0 0 L-4 -6 L0 -62 L4 -6Z"/><path d="M0 0 L-4 -6 L0 -62 L4 -6Z" transform="rotate(120)"/><path d="M0 0 L-4 -6 L0 -62 L4 -6Z" transform="rotate(240)"/></g><circle r="5"/></g></g>
+      </g>
+      <g transform="translate(420 168)">
+        <rect x="0" y="-16" width="64" height="12" rx="2" fill="var(--water)" transform="skewX(-20)"/>
+        <rect x="14" y="-16" width="64" height="12" rx="2" fill="var(--water)" opacity=".7" transform="skewX(-20)"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<main>
+  <div class="meter" id="meter" aria-hidden="true"></div>
+  <div class="meta"><span id="pos"></span><span id="sc"></span></div>
+  <section class="card" id="card" aria-live="polite"></section>
+  <div class="nav" id="nav"><h3>Chuyển nhanh tới câu</h3><div class="dots" id="dots"></div></div>
+</main>
+
+<script>
+(function(){
+var Q=[
+["Nhu cầu tiêu thụ than trong nước tăng từ 7,8 triệu tấn năm 1995 lên 81,3 triệu tấn năm 2020, trong khi sản lượng khai thác năm 2020 chỉ đạt 38,5 triệu tấn. Điều này cho thấy vấn đề gì?",["Nguồn than trong nước không còn giá trị khai thác.","Tốc độ gia tăng nhu cầu tiêu thụ vượt xa khả năng đáp ứng của sản xuất trong nước.","Việt Nam đã chuyển hoàn toàn sang sử dụng than nhập khẩu.","Sản lượng khai thác than tăng nhanh hơn nhu cầu tiêu thụ."],1,"Nhu cầu tăng hơn 10 lần, còn sản lượng năm 2020 (38,5 triệu tấn) chưa bằng một nửa nhu cầu (81,3 triệu tấn)."],
+["Tại sao mặc dù Việt Nam có tiềm năng thủy điện lớn, khả năng khai thác thủy điện vẫn có giới hạn?",["Nguồn nước ở Việt Nam chỉ tập trung tại khu vực đồng bằng.","Các điều kiện tự nhiên thuận lợi cho xây dựng thủy điện không phân bố đồng đều và nhiều vị trí thuận lợi đã được khai thác.","Thủy điện không thể đáp ứng nhu cầu sản xuất công nghiệp.","Việt Nam không có hệ thống sông ngòi đủ lớn."],1,"Vị trí thuận lợi phân bố không đều và nhiều nơi đã được xây dựng, nên dư địa còn lại bị thu hẹp."],
+["Việc Việt Nam phải nhập khẩu dầu và các sản phẩm xăng dầu chủ yếu xuất phát từ nguyên nhân nào?",["Trữ lượng dầu thô trong nước hoàn toàn không có.","Việt Nam không có nhu cầu khai thác dầu khí.","Khả năng lọc dầu trong nước còn hạn chế, chưa đáp ứng đầy đủ nhu cầu tiêu thụ.","Dầu thô trong nước không thể sử dụng để sản xuất năng lượng."],2,"Việt Nam có khai thác dầu thô, nhưng công suất lọc dầu trong nước chưa đủ so với nhu cầu."],
+["Vì sao việc khai thác năng lượng mặt trời ở Việt Nam được đánh giá có nhiều tiềm năng nhưng vẫn chưa tương xứng với lợi thế tự nhiên?",["Số giờ nắng ở Việt Nam quá thấp.","Nguồn năng lượng này không thể chuyển hóa thành điện năng.","Việc khai thác và sử dụng còn hạn chế, cần đầu tư và phát triển công nghệ phù hợp.","Năng lượng mặt trời chỉ có thể khai thác ở khu vực miền núi."],2,"Số giờ nắng cao, nhưng việc khai thác còn hạn chế và cần vốn đầu tư cùng công nghệ phù hợp."],
+["Một nhà máy nhiệt điện sử dụng 2 triệu tấn than/năm. Sau khi cải tiến công nghệ, hiệu suất phát điện tăng từ 35% lên 42%, trong khi lượng điện sản xuất được giữ nguyên. Nhận định nào chính xác nhất?",
+["Lượng than tiêu thụ giảm khoảng 16,7%, góp phần giảm chi phí nhiên liệu và phát thải trên mỗi đơn vị điện.","Lượng than tiêu thụ giảm đúng 7% vì hiệu suất tăng 7 điểm phần trăm.","Lượng than tiêu thụ không thay đổi vì sản lượng điện vẫn giữ nguyên.","Lượng than tiêu thụ giảm 20% vì hiệu suất tăng từ 35% lên 42%."],
+0,
+"Với cùng sản lượng điện, lượng nhiên liệu tiêu thụ tỉ lệ nghịch với hiệu suất. Tỉ lệ tiêu thụ mới bằng 35/42 = 5/6 so với ban đầu, tương ứng giảm khoảng 16,7%."],
+["Tại sao việc xây dựng các nhà máy thủy điện ở thượng nguồn có thể ảnh hưởng đến sản xuất nông nghiệp ở hạ lưu?",["Làm thay đổi chế độ dòng chảy, ảnh hưởng đến nguồn nước phục vụ tưới tiêu và sinh hoạt.","Làm tăng lượng ánh sáng mặt trời chiếu xuống đồng bằng.","Làm giảm hoàn toàn lượng nước mưa tại hạ lưu.","Làm tăng độ phì nhiêu của đất trên toàn lưu vực."],0,"Hồ chứa điều tiết dòng chảy, nên lượng nước và thời điểm nước về hạ lưu thay đổi."],
+["Một lưu vực sông có hai quốc gia cùng khai thác nguồn nước. Quốc gia A xây dựng hồ thủy điện lớn ở thượng nguồn nhằm đảm bảo sản lượng điện mùa khô. Quốc gia B ở hạ nguồn phụ thuộc vào dòng chảy tự nhiên để sản xuất nông nghiệp. Khi A thay đổi chế độ xả nước, B có nguy cơ thiếu nước vào thời điểm gieo trồng. Nhận định nào thể hiện đầy đủ nhất bản chất vấn đề?",
+["Đây chỉ là vấn đề thiếu nước do điều kiện khí hậu, không liên quan đến hoạt động khai thác năng lượng.","Thủy điện luôn có tác động tích cực đến toàn bộ lưu vực vì điều tiết được dòng chảy.","Khai thác năng lượng có thể tạo ra xung đột lợi ích giữa các quốc gia, đòi hỏi hợp tác quản lí tài nguyên nước xuyên biên giới.","Quốc gia hạ nguồn cần tự xây dựng thêm thủy điện để loại bỏ hoàn toàn ảnh hưởng từ thượng nguồn."],
+2,
+"Việc điều tiết dòng chảy ở thượng nguồn có thể ảnh hưởng trực tiếp đến nguồn nước hạ lưu. Do đó, cần có sự phối hợp giữa các quốc gia trong quản lí và khai thác tài nguyên nước."],
+["Một tỉnh có nhu cầu điện 10 tỉ kWh/năm. Hiện tại, nhiệt điện cung cấp 60%, thủy điện 30% và các nguồn khác 10%. Trong 5 năm tới, nhu cầu điện dự kiến tăng 40%, trong khi sản lượng thủy điện khó tăng do giới hạn tài nguyên. Phương án nào có tính khả thi và bền vững nhất?",
+["Tăng sản lượng nhiệt điện để đáp ứng toàn bộ phần nhu cầu điện tăng thêm.","Phát triển điện gió, điện mặt trời kết hợp hệ thống lưu trữ, nâng cấp lưới điện và tiết kiệm năng lượng.","Tăng khai thác thủy điện bằng cách xây dựng thêm hồ chứa tại mọi vị trí có thể.","Giữ nguyên cơ cấu nguồn điện và nhập khẩu toàn bộ lượng điện thiếu hụt."],
+1,
+"Kết hợp năng lượng tái tạo, lưu trữ và tiết kiệm điện giúp đáp ứng nhu cầu tăng trưởng, giảm phụ thuộc vào nhiệt điện và đảm bảo tính ổn định của hệ thống điện."],
+["Tại sao cần kết hợp nhiều nguồn năng lượng khác nhau thay vì phụ thuộc vào một nguồn duy nhất?",["Mỗi nguồn năng lượng đều có điều kiện khai thác và giới hạn riêng, kết hợp giúp tăng tính ổn định của cung ứng.","Mọi nguồn năng lượng đều có sản lượng ổn định như nhau.","Một nguồn năng lượng duy nhất không thể tạo ra điện năng.","Kết hợp nhiều nguồn năng lượng sẽ loại bỏ hoàn toàn tác động môi trường."],0,"Các nguồn bổ sung cho nhau: nơi này thiếu nắng thì có gió, mùa này ít nước thì có nguồn khác."],
+["Nhận định nào thể hiện đúng mối quan hệ giữa sử dụng năng lượng và trình độ phát triển kinh tế?",["Quốc gia càng phát triển thì càng phải sử dụng nhiều năng lượng một cách lãng phí.","Mức tiêu thụ năng lượng có thể phản ánh một phần trình độ phát triển, nhưng cần xét thêm hiệu quả sử dụng và cơ cấu năng lượng.","Chỉ cần dựa vào lượng than tiêu thụ là có thể xác định chính xác trình độ phát triển của một quốc gia.","Trình độ phát triển kinh tế không liên quan đến nhu cầu năng lượng."],1,"Tiêu thụ năng lượng liên quan đến phát triển, nhưng phải xét cả hiệu quả và cơ cấu nguồn."],
+["Một địa phương dự kiến đầu tư một trang trại điện mặt trời công suất lớn trên diện tích đất đang được sử dụng để sản xuất nông nghiệp. Dự án có thể tạo ra nguồn điện sạch nhưng đồng thời làm giảm diện tích canh tác. Nếu mục tiêu là phát triển bền vững, phương án nào nên được ưu tiên?",
+["Chấp thuận dự án vì năng lượng tái tạo luôn có lợi ích lớn hơn nông nghiệp.","Bác bỏ toàn bộ dự án vì sử dụng đất cho năng lượng sẽ gây ảnh hưởng đến an ninh lương thực.","Đánh giá tổng hợp hiệu quả kinh tế, môi trường và xã hội; ưu tiên vị trí ít xung đột sử dụng đất hoặc mô hình kết hợp sản xuất nông nghiệp với điện mặt trời phù hợp.","Chỉ xem xét sản lượng điện và thời gian hoàn vốn để quyết định đầu tư."],
+2,
+"Phát triển năng lượng tái tạo cần gắn với quy hoạch sử dụng đất hợp lí, đảm bảo cân bằng giữa sản xuất năng lượng, nông nghiệp, môi trường và lợi ích xã hội."],
+
+["Một nhà máy nhiệt điện tăng công suất nhằm đáp ứng nhu cầu điện ngày càng lớn. Tuy nhiên, nhà máy vẫn sử dụng nhiên liệu hóa thạch. Đánh giá nào hợp lí nhất?",["Đây là giải pháp hoàn toàn bền vững vì đã giải quyết được nhu cầu điện.","Việc tăng công suất chỉ đem lại lợi ích kinh tế, không có tác động môi trường.","Có thể đáp ứng nhu cầu năng lượng trước mắt nhưng đồng thời làm gia tăng áp lực phát thải nếu không có giải pháp kiểm soát phù hợp.","Việc tăng công suất sẽ làm giảm lượng nhiên liệu hóa thạch tiêu thụ."],2,"Đáp ứng được nhu cầu trước mắt, nhưng đốt thêm nhiên liệu hóa thạch làm tăng phát thải."],
+["Một khu vực đồng bằng thường xuyên chịu tình trạng xâm nhập mặn và thiếu nước vào mùa khô. Theo nội dung bài học, tác động nào có thể liên quan đến việc khai thác thủy điện ở thượng nguồn?",["Làm tăng lượng nước ngọt tự nhiên trong toàn bộ khu vực.","Thay đổi dòng chảy và lượng nước về hạ lưu, góp phần làm trầm trọng thêm tình trạng thiếu nước.","Ngăn chặn hoàn toàn quá trình xâm nhập mặn.","Làm tăng khả năng giữ nước của đất mà không cần biện pháp khác."],1,"Dòng chảy về hạ lưu giảm hoặc đổi nhịp vào mùa khô, nước mặn dễ lấn sâu hơn."],
+["Một gia đình thường xuyên bật điều hòa ở nhiệt độ thấp, mở cửa phòng khi sử dụng và không vệ sinh thiết bị định kỳ. Biện pháp nào dưới đây giúp cải thiện hiệu quả sử dụng năng lượng toàn diện nhất?",["Tăng thời gian sử dụng điều hòa để duy trì nhiệt độ ổn định.","Chỉ thay điều hòa mới mà không thay đổi thói quen sử dụng.","Điều chỉnh nhiệt độ hợp lí, đóng kín cửa và bảo dưỡng thiết bị định kỳ.","Kết hợp bật thêm quạt và mở cửa để không khí lưu thông."],2,"Cả ba thói quen đều được sửa: nhiệt độ vừa phải, đóng kín cửa và bảo dưỡng thiết bị."],
+["Một quốc gia có nhu cầu năng lượng tăng nhanh nhưng nguồn nhiên liệu hóa thạch trong nước ngày càng suy giảm. Giải pháp nào có tính chiến lược lâu dài nhất?",["Tăng nhập khẩu nhiên liệu hóa thạch và không cần thay đổi cơ cấu năng lượng.","Ngừng toàn bộ hoạt động sản xuất công nghiệp.","Đẩy mạnh tiết kiệm năng lượng, đa dạng hóa nguồn cung và phát triển năng lượng tái tạo.","Chỉ tập trung khai thác tối đa nguồn thủy điện."],2,"Tiết kiệm, đa dạng nguồn và phát triển năng lượng tái tạo giúp giảm phụ thuộc về lâu dài."],
+["Một dự án điện gió ngoài khơi được đề xuất tại vùng biển có tiềm năng gió lớn. Tuy nhiên, khu vực này cũng có hoạt động đánh bắt thủy sản. Cách tiếp cận nào phù hợp nhất?",["Triển khai dự án ngay vì tiềm năng gió quan trọng hơn mọi hoạt động khác.","Hủy bỏ dự án vì điện gió luôn gây hại cho hoạt động thủy sản.","Đánh giá tác động môi trường, quy hoạch không gian biển và cân đối lợi ích giữa các hoạt động kinh tế.","Chỉ quan tâm đến sản lượng điện dự kiến của dự án."],2,"Cần đánh giá tác động và quy hoạch để điện gió và nghề cá cùng tồn tại."],
+["Một doanh nghiệp thay thế hệ thống máy móc cũ bằng công nghệ hiện đại giúp giảm 25% điện năng tiêu thụ nhưng vẫn duy trì sản lượng sản phẩm. Điều này thể hiện điều gì?",["Nâng cao hiệu quả sử dụng năng lượng thông qua cải tiến công nghệ.","Giảm năng suất lao động để tiết kiệm điện.","Tăng mức độ phụ thuộc vào năng lượng hóa thạch.","Giảm nhu cầu sản xuất của doanh nghiệp."],0,"Cùng sản lượng nhưng dùng ít điện hơn 25% tức là hiệu quả năng lượng tăng."],
+["Một địa phương ở miền Trung có nhiều suối nước nóng với nhiệt độ trung bình từ 70–100°C. Hướng khai thác năng lượng nào phù hợp nhất với lợi thế này?",["Điện gió.","Điện mặt trời.","Năng lượng địa nhiệt.","Năng lượng thủy triều."],2,"Nguồn nhiệt từ lòng đất, như suối nước nóng, là lợi thế của năng lượng địa nhiệt."],
+["Việt Nam vừa cần đảm bảo an ninh năng lượng, vừa phải hạn chế những thiệt hại do biến đổi khí hậu. Trong các lựa chọn dưới đây, đâu là định hướng phù hợp nhất?",["Chỉ ưu tiên khai thác năng lượng có giá thành thấp trước mắt.","Kết hợp khai thác hợp lí nguồn năng lượng hiện có, phát triển năng lượng tái tạo và nâng cao hiệu quả sử dụng năng lượng.","Tăng tối đa sản lượng nhiệt điện mà không cần quan tâm đến phát thải.","Chuyển hoàn toàn sang năng lượng mặt trời trong thời gian ngắn."],1,"Cần cân bằng giữa an ninh năng lượng và giảm phát thải, nên phải kết hợp nhiều hướng."],
+["Một quốc gia có các đặc điểm: nhu cầu điện tăng nhanh do công nghiệp hóa; trữ lượng than đang suy giảm; tiềm năng điện gió và điện mặt trời lớn nhưng sản lượng không ổn định; khả năng nhập khẩu nhiên liệu phụ thuộc vào thị trường quốc tế. Một chuyên gia đề xuất chuyển hoàn toàn sang năng lượng tái tạo trong 5 năm để chấm dứt phụ thuộc nhiên liệu hóa thạch. Đánh giá nào có cơ sở khoa học nhất?",
+["Hoàn toàn hợp lí vì năng lượng tái tạo không gây ra bất kì tác động môi trường nào.","Không khả thi trong mọi trường hợp vì điện gió và điện mặt trời không thể cung cấp điện cho công nghiệp.","Mục tiêu giảm phụ thuộc nhiên liệu hóa thạch là phù hợp, nhưng cần lộ trình chuyển dịch đồng bộ với lưu trữ năng lượng, lưới điện, nguồn điện điều độ được và khả năng tài chính.","Nên duy trì nhiệt điện than cho đến khi toàn bộ trữ lượng than được khai thác hết."],
+2,
+"Chuyển dịch năng lượng cần có lộ trình phù hợp với điều kiện kinh tế, công nghệ và hạ tầng. Việc phát triển năng lượng tái tạo phải đi kèm hệ thống lưu trữ, lưới điện và các nguồn điện có khả năng điều chỉnh công suất."]
+
+];
+var N=Q.length, L=["A","B","C","D"];
+var cur=0, ans=new Array(N).fill(null), done=false, onlyWrong=null;
+var $=function(i){return document.getElementById(i)};
+function esc(s){return s.replace(/[&<>]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;"}[c]})}
+function score(){return ans.reduce(function(a,v,i){return a+(v===Q[i][2]?1:0)},0)}
+function answered(){return ans.filter(function(v){return v!==null}).length}
+function status(i){return ans[i]===null?"":(ans[i]===Q[i][2]?"ok":"no")}
+function chrome(){
+  var m="",d="";
+  for(var i=0;i<N;i++){
+    var s=status(i); var c=s||(i===cur&&!done?"cur":"");
+    m+='<div class="cell '+c+'"></div>';
+    d+='<button class="dot '+s+(i===cur&&!done?" cur":"")+'" type="button" data-i="'+i+'" aria-label="Câu '+(i+1)+'">'+(i+1)+'</button>';
+  }
+  $("meter").innerHTML=m; $("dots").innerHTML=d;
+  $("pos").textContent=done?"Hoàn thành":"Câu "+(cur+1)+" / "+N;
+  $("sc").textContent="Đúng "+score()+" · Đã làm "+answered()+"/"+N;
+  $("nav").hidden=done;
+}
+function render(){
+  chrome();
+  if(done){return renderResult()}
+  var q=Q[cur], a=ans[cur], locked=a!==null;
+  var h='<span class="tag '+(cur<10?"t1":"t2")+'">'+(cur<10?"Nhận biết & hiểu":"Vận dụng")+'</span><h2>'+esc(q[0])+'</h2><ul class="opts">';
+  q[1].forEach(function(t,k){
+    var c=""; if(locked){ if(k===q[2])c="right"; else if(k===a)c="wrong"; }
+    h+='<li><button class="opt '+c+'" type="button" data-k="'+k+'"'+(locked?" disabled":"")+'><span class="k">'+L[k]+'</span><span class="tx">'+esc(t)+'</span></button></li>';
+  });
+  h+='</ul>';
+  if(locked){ h+='<div class="fb"><b>'+(a===q[2]?"Chính xác. ":"Chưa đúng. Đáp án là "+L[q[2]]+". ")+'</b>'+esc(q[3])+'</div>'; }
+  var last=cur===N-1;
+  h+='<div class="actions"><button class="btn ghost" type="button" id="prev"'+(cur===0?" disabled":"")+'>Câu trước</button>';
+  h+= last ? '<button class="btn" type="button" id="finish"'+(answered()<N?" disabled":"")+'>Xem kết quả</button>' : '<button class="btn" type="button" id="next">'+(locked?"Câu tiếp":"Bỏ qua")+'</button>';
+  h+='</div>';
+  $("card").innerHTML=h;
+}
+function renderResult(){
+  var s=score(), msg= s>=18?"Rất tốt! Bạn nắm chắc kiến thức bài này.": s>=14?"Khá tốt. Xem lại vài câu sai để chắc hơn.": s>=10?"Cần ôn thêm. Đọc kĩ phần giải thích ở các câu sai.":"Hãy ôn lại bài rồi thử lần nữa.";
+  var h='<div class="result"><span class="tag t1">Kết quả</span><div class="score">'+s+'<small> / '+N+'</small></div><p>'+msg+'</p>';
+  h+='<div class="row"><button class="btn" type="button" id="again">Làm lại</button>';
+  h+='<button class="btn ghost" type="button" id="tog">'+(onlyWrong?"Hiện tất cả câu":"Chỉ hiện câu sai")+'</button></div><ul class="review">';
+  Q.forEach(function(q,i){
+    var s2=status(i); if(onlyWrong&&s2!=="no")return;
+    h+='<li class="'+s2+'"><b>Câu '+(i+1)+':</b> '+esc(q[0])+'<br><b>Bạn chọn:</b> '+L[ans[i]]+'. '+esc(q[1][ans[i]])+(s2==="no"?'<br><b>Đáp án:</b> '+L[q[2]]+'. '+esc(q[1][q[2]]):"")+'<br>'+esc(q[3])+'</li>';
+  });
+  h+='</ul></div>';
+  $("card").innerHTML=h;
+}
+$("card").addEventListener("click",function(e){
+  var t=e.target.closest("button"); if(!t)return;
+  if(t.classList.contains("opt")){ans[cur]=+t.dataset.k;render();return}
+  if(t.id==="next"){cur=Math.min(N-1,cur+1);render()}
+  else if(t.id==="prev"){cur=Math.max(0,cur-1);render()}
+  else if(t.id==="finish"){done=true;onlyWrong=false;render();window.scrollTo(0,0)}
+  else if(t.id==="again"){ans=new Array(N).fill(null);cur=0;done=false;render();window.scrollTo(0,0)}
+  else if(t.id==="tog"){onlyWrong=!onlyWrong;render()}
+});
+$("dots").addEventListener("click",function(e){var t=e.target.closest(".dot");if(t){cur=+t.dataset.i;render()}});
+$("theme").addEventListener("click",function(){
+  var r=document.documentElement, dark=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+  r.setAttribute("data-theme",dark?"light":"dark");
+});
+render();
+})();
+</script>
